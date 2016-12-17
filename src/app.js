@@ -174,7 +174,9 @@ function Job({date, featured, id, info, metadata, photos, title, year, style, on
 class App extends Component {
   state = {
     loading: true,
-    jobs: [],
+    data: [],
+    filter: 'done',
+    filtered: [],
   }
 
   componentWillMount() {
@@ -182,10 +184,12 @@ class App extends Component {
   }
 
   load = async () => {
+    let {filter} = this.state
     let data = await fetchJson(`${SERVER}/completed`)
+    data = _.filter(data, job => this.applyFilter(job, filter))
     data = _.sampleSize(data, 8)
     data = _.shuffle(data)
-    this.setState({jobs: data})
+    this.setState({data: data})
   }
 
   showModal = (id) => {
@@ -196,30 +200,52 @@ class App extends Component {
     this.setState({selected: null})
   }
 
+  applyFilter = (job, filter) =>  {
+    switch (filter) {
+      case 'todo': return this.onlyTodo(job)
+      case 'done': return this.onlyDone(job)
+      default: return true
+    }
+  }
+
+  onlyTodo = job => {
+    let {category, material, size} = job.info
+    return [category, material, size].some(x => !x)
+  }
+
+  onlyDone = job => {
+    let {category, material, size} = job.info
+    return [category, material, size].every(x => x)
+  }
+
   render() {
+    let {data} = this.state
+
     return (
-      <Flex
-        flexFlow='row wrap'
-        justifyContent='space-around'
-        alignItems='center'
-        padding='15px'
-        backgroundColor='#eaeaea'
-        minHeight='100vh'
-      >
-        {this.state.jobs.map(j =>
-          <Job
-            key={j.id}
-            {...j}
-            onClick={this.showModal}
-            style={{width: '300px', margin: '15px'}}
-          />)}
-        {this.state.selected
-          ? <ModalJob
-            {...this.state.jobs.find(j => j.id === this.state.selected)}
-            onClose={this.hideModal}
-          />
-          : null}
-      </Flex>
+      <Block>
+        <Flex
+          flexFlow='row wrap'
+          justifyContent='space-around'
+          alignItems='center'
+          padding='15px'
+          backgroundColor='#eaeaea'
+          minHeight='100vh'
+        >
+          {data.map(j =>
+            <Job
+              key={j.id}
+              {...j}
+              onClick={this.showModal}
+              style={{width: '300px', margin: '15px'}}
+            />)}
+        </Flex>
+      {this.state.selected
+        ? <ModalJob
+          {...this.state.data.find(j => j.id === this.state.selected)}
+          onClose={this.hideModal}
+        />
+        : null}
+      </Block>
     )
   }
 }
