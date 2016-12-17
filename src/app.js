@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import _ from 'lodash'
 import {Block, Flex} from 'jsxstyle'
+import makeStyleComponentClass from 'jsxstyle/lib/makeStyleComponentClass'
+const Grid = makeStyleComponentClass({display: 'grid'}, 'Grid');
 
 const fetchJson = (...args) => fetch(...args).then(r => r.json())
 const SERVER = process.env.SERVER || 'http://localhost:3005'
@@ -27,7 +29,7 @@ const regularSrcset = (id, imageName, width=200) =>
 function ModalJob({date, featured, id, info, metadata, photos, title, year, style, onClose}) {
   console.log(arguments)
   return (
-    <Flex
+    <Grid
       position='fixed'
       top='0px'
       right='0px'
@@ -36,62 +38,55 @@ function ModalJob({date, featured, id, info, metadata, photos, title, year, styl
       background='rgba(0, 0, 0, 0.0980392)'
       justifyContent='center'
       alignItems='center'
+      gridTemplateAreas='"top top top" "left dialog right" "bottom bottom bottom"'
+      gridTemplateRows='100px 1fr 100px'
+      gridTemplateColumns='100px 1fr 100px'
       props={{onClick: onClose}}
     >
-      <Flex
-        flexDirection='column'
+      <Grid
+        gridArea='dialog'
+        gridTemplateAreas={[
+          '"title title"',
+          '"photos info"',
+        ].join(' ')}
+        gridTemplateRows='auto 1fr'
+        gridTemplateColumns='2fr 1fr'
+        border='solid 5px black'
         backgroundColor='white'
-        boxShadow='0 5px 10px rgba(0,0,0,0.1)'
+        boxShadow='0 5px 10px rgba(0,0,0,0.5)'
         borderRadius='5px'
-        width='600px'
+        padding='1em'
+        //maxWidth='80vw'
+        overflowY='auto'
+        maxHeight='calc(100vh - 210px)'
         {...style}
       >
         <Block
           padding='1em'
-          overflow='hidden'
-          whiteSpace='nowrap'
-          textOverflow='ellipsis'
           cursor='default'
+          gridArea='title'
         >
           {date} • {title}
         </Block>
-        <Block
-          component='figure'
-          transition='margin 0.1s, height 0.1s, border-radius 0.1s'
-          margin='0 1em 1em'
-          borderRadius='3px'
-          overflow='hidden'
-        >
-          <Block
-            component='img'
-            maxWidth='100%'
-            width='100%'
-            height='100%'
-            objectFit='cover'
-            props={{
-              srcSet: featuredSrcset(id),
-            }}
-          />
-        </Block>
 
-        <Flex
-          flexFlow='row wrap'
+        <Grid
+          gridArea='photos'
+          gridAutoRows='1fr'
+          gridTemplateColumns='repeat(2, 1fr)'
           justifyContent='center'
         >
           {photos.map((p, i) =>
-            <Flex
+            <Block
               key={i}
               component='figure'
+              margin='0.5em'
               borderColor={p.filename === featured ? 'lightblue' : 'transparent'}
               borderWidth='5px'
               borderStyle='solid'
               transition='transform 0.1s, filter 0.1s'
-              flex='1 0 auto'
               borderRadius='3px'
               overflow='hidden'
               hoverTransform='scale(1.05)'
-              //filter={p.filename === featured ? '' : 'sepia(100%)'}
-              //hoverFilter={'sepia(0%)'}
             >
               <Block
                 component='img'
@@ -103,10 +98,42 @@ function ModalJob({date, featured, id, info, metadata, photos, title, year, styl
                   srcSet: regularSrcset(id, p.filename),
                 }}
               />
-            </Flex>)}
-        </Flex>
-      </Flex>
-    </Flex>
+            </Block>)}
+        </Grid>
+
+        <Grid
+          gridArea='info'
+          gridAutoRows='1fr'
+          gridTemplateColumns='repeat(1, 1fr)'
+          justifyContent='center'
+        >
+          {photos.map((p, i) =>
+            <Block
+              key={i}
+              component='figure'
+              margin='0.5em'
+              borderColor='transparent'
+              borderWidth='5px'
+              borderStyle='solid'
+              transition='transform 0.1s, filter 0.1s'
+              borderRadius='3px'
+              overflow='hidden'
+              hoverTransform='scale(1.05)'
+            >
+              <Block
+                component='img'
+                maxWidth='100%'
+                width='100%'
+                height='100%'
+                objectFit='cover'
+                props={{
+                  srcSet: regularSrcset(id, p.filename),
+                }}
+              />
+            </Block>)}
+        </Grid>
+      </Grid>
+    </Grid>
   )
 }
 
@@ -166,7 +193,7 @@ class App extends Component {
   }
 
   load = async () => {
-    let data = await fetchJson(`${SERVER}/completed?count=8`)
+    let data = await fetchJson(`${SERVER}/completed`)
     data = _.sampleSize(data, 8)
     data = _.shuffle(data)
     this.setState({jobs: data})
