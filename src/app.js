@@ -27,7 +27,6 @@ const regularSrcset = (id, imageName, width=200) =>
     .join(', ')
 
 function ModalJob({date, featured, id, info, metadata, photos, title, year, style, onClose}) {
-  console.log(arguments)
   return (
     <Grid
       position='fixed'
@@ -38,17 +37,14 @@ function ModalJob({date, featured, id, info, metadata, photos, title, year, styl
       background='rgba(0, 0, 0, 0.0980392)'
       justifyContent='center'
       alignItems='center'
-      gridTemplateAreas='"top top top" "left dialog right" "bottom bottom bottom"'
+      gridTemplateAreas='"t t t" "l dialog r" "b b b"'
       gridTemplateRows='100px 1fr 100px'
       gridTemplateColumns='100px 1fr 100px'
       props={{onClick: onClose}}
     >
       <Grid
         gridArea='dialog'
-        gridTemplateAreas={[
-          '"title title"',
-          '"photos info"',
-        ].join(' ')}
+        gridTemplateAreas='"title title" "photos info"'
         gridTemplateRows='auto 1fr'
         gridTemplateColumns='2fr 1fr'
         border='solid 5px black'
@@ -56,7 +52,6 @@ function ModalJob({date, featured, id, info, metadata, photos, title, year, styl
         boxShadow='0 5px 10px rgba(0,0,0,0.5)'
         borderRadius='5px'
         padding='1em'
-        //maxWidth='80vw'
         overflowY='auto'
         maxHeight='calc(100vh - 210px)'
         {...style}
