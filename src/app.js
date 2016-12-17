@@ -62,7 +62,7 @@ function ModalJob({date, featured, id, info, metadata, photos, title, year, styl
         gridArea='dialog'
         gridTemplateAreas='"title title" "photos info"'
         gridTemplateRows='auto 1fr'
-        gridTemplateColumns='2fr 1fr'
+        gridTemplateColumns='1fr 300px'
         border='solid 5px black'
         backgroundColor='white'
         boxShadow='0 5px 10px rgba(0,0,0,0.5)'
@@ -113,21 +113,14 @@ function ModalJob({date, featured, id, info, metadata, photos, title, year, styl
             </Block>)}
         </Grid>
 
-        <Grid
-          gridArea='info'
-          gridAutoRows='1fr'
-          gridTemplateColumns='repeat(1, 1fr)'
-          justifyContent='center'
-        >
-          <JobMetadata {...{
-            date,
-            id,
-            info,
-            metadata,
-            title,
-            year,
-          }} />
-        </Grid>
+        <JobMetadata {...{
+          date,
+          id,
+          info,
+          metadata,
+          title,
+          year,
+        }} />
       </Grid>
     </Grid>
   )

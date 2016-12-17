@@ -1,7 +1,7 @@
 import React from 'react'
 import isArray from 'lodash/isArray'
 import startCase from 'lodash/startCase'
-import {Block, Inline} from 'jsxstyle'
+import {Block, InlineBlock, InlineFlex, Flex} from 'jsxstyle'
 
 const CATEGORIES = ['Monument', 'Bench', 'Inscription', 'Statue', 'Reference', 'WIP', 'Other']
 const MATERIALS = ['Granite', 'Bronze', 'Marble', 'Other']
@@ -90,42 +90,84 @@ const DETAILS = {
   },
 }
 
-function Selector(props) {
-  let {type, title, selected, options, onChange, warning} = props
+function Selector({type, title, selected, options=[], onChange, warning}) {
   let inputType = type === 'and'
     ? 'checkbox'
     : 'radio'
 
+  let checkboxStyles = {
+    flexDirection: 'row',
+    minWidth: '25%',
+    paddingTop: '8px',
+    paddingBottom: '8px',
+  }
+  let radioButtonStyles = {
+    flexDirection: 'column',
+    minWidth: '60px',
+  }
+  let optionStyles = inputType === 'radio' ? radioButtonStyles : checkboxStyles
+  let selectedStyles = {
+    backgroundColor: '#404040',
+    color: 'white',
+    borderRadius: '3px',
+  }
+
   return (
-    <Block className={`selector ${inputType}`}>
-      <Block component='h2'>{title}</Block>
-      <Block className='contents'>
+    <Block
+      userSelect='none'
+      backgroundColor='#efefef'
+      borderRadius='3px'
+      padding='5px'
+      marginBottom='1em'
+    >
+      <Block
+        component='h2'
+        fontSize='1em'
+        textAlign='center'
+        marginTop='0'
+        marginBottom='0.25em'
+      >
+        {title}
+      </Block>
+      <Flex
+        flexFlow='row wrap'
+      >
         {warning
-          ? <Block>{warning}</Block>
+          ? <Block padding='6px'>{warning}</Block>
           : options.map(val => {
             let isChecked = isArray(selected)
               ? selected.includes(val)
               : val === selected
 
             return (
-              <Block component='label' key={val}>
-                <input
-                  type={inputType}
-                  value={val}
-                  name={title}
-                  checked={isChecked}
-                  onChange={ev => onChange(ev.target.value)}
+              <InlineFlex
+                component='label'
+                key={val}
+                flex='1 0 auto'
+                margin='2px 4px'
+                padding='2px'
+                flexWrap='nowrap'
+                alignItems='center'
+                {...optionStyles}
+                {...isChecked ? selectedStyles : {}}
+              >
+                <InlineBlock
+                  component='input'
+                  props={{
+                    type: inputType,
+                    value: val,
+                    name: title,
+                    checked: isChecked,
+                    onChange: ev => onChange(ev.target.value),
+                  }}
                 />
-                <Inline>{val}</Inline>
-              </Block>
+                <InlineBlock>{val}</InlineBlock>
+              </InlineFlex>
             )
           })}
-      </Block>
+      </Flex>
     </Block>
   )
-}
-Selector.defaultProps = {
-  options: [],
 }
 
 export function Tagger({info, onChangeMetadata}) {
