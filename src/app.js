@@ -4,6 +4,8 @@ import {Block, Flex} from 'jsxstyle'
 import makeStyleComponentClass from 'jsxstyle/lib/makeStyleComponentClass'
 const Grid = makeStyleComponentClass({display: 'grid'}, 'Grid');
 
+import {Tagger} from './tagger'
+
 const fetchJson = (...args) => fetch(...args).then(r => r.json())
 const SERVER = process.env.SERVER || 'http://localhost:3005'
 
@@ -13,6 +15,20 @@ const combos = [
   {type: 'jpg', density: '2x'},
   {type: 'webp', density: '2x'},
 ]
+
+function JobMetadata({date, id, info, metadata, year, title}) {
+  return (
+    <Tagger
+      date={date}
+      id={id}
+      info={info}
+      title={title}
+      metadata={metadata}
+      onChangeMetadata={key => value => console.log(key, value)}
+      year={year}
+    />
+  )
+}
 
 const featuredSrcset = (id, width=400) =>
   combos
@@ -54,6 +70,7 @@ function ModalJob({date, featured, id, info, metadata, photos, title, year, styl
         padding='1em'
         overflowY='auto'
         maxHeight='calc(100vh - 210px)'
+        props={{onClick: ev => ev.stopPropagation()}}
         {...style}
       >
         <Block
@@ -66,7 +83,7 @@ function ModalJob({date, featured, id, info, metadata, photos, title, year, styl
 
         <Grid
           gridArea='photos'
-          gridAutoRows='1fr'
+          gridAutoRows='200px'
           gridTemplateColumns='repeat(2, 1fr)'
           justifyContent='center'
         >
@@ -102,30 +119,14 @@ function ModalJob({date, featured, id, info, metadata, photos, title, year, styl
           gridTemplateColumns='repeat(1, 1fr)'
           justifyContent='center'
         >
-          {photos.map((p, i) =>
-            <Block
-              key={i}
-              component='figure'
-              margin='0.5em'
-              borderColor='transparent'
-              borderWidth='5px'
-              borderStyle='solid'
-              transition='transform 0.1s, filter 0.1s'
-              borderRadius='3px'
-              overflow='hidden'
-              hoverTransform='scale(1.05)'
-            >
-              <Block
-                component='img'
-                maxWidth='100%'
-                width='100%'
-                height='100%'
-                objectFit='cover'
-                props={{
-                  srcSet: regularSrcset(id, p.filename),
-                }}
-              />
-            </Block>)}
+          <JobMetadata {...{
+            date,
+            id,
+            info,
+            metadata,
+            title,
+            year,
+          }} />
         </Grid>
       </Grid>
     </Grid>
