@@ -54,7 +54,7 @@ function ModalJob({date, featured, id, info, metadata, photos, title, year, styl
       justifyContent='center'
       alignItems='center'
       gridTemplateAreas='"t t t" "l dialog r" "b b b"'
-      gridTemplateRows='100px 1fr 100px'
+      gridTemplateRows='10px 1fr 10px'
       gridTemplateColumns='100px 1fr 100px'
       props={{onClick: onClose}}
     >
@@ -69,7 +69,7 @@ function ModalJob({date, featured, id, info, metadata, photos, title, year, styl
         borderRadius='5px'
         padding='1em'
         overflowY='auto'
-        maxHeight='calc(100vh - 210px)'
+        maxHeight='calc(100vh - 20px)'
         props={{onClick: ev => ev.stopPropagation()}}
         {...style}
       >
